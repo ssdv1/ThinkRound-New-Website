@@ -19,7 +19,8 @@ export default defineType({
     defineField({
       name: 'description',
       title: 'Description',
-      type: 'text',
+      //type: 'text'
+      type: 'markdown' //https://www.sanity.io/plugins/sanity-plugin-markdown
     }),
   ],
 })
