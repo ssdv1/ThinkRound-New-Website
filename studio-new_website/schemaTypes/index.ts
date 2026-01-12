@@ -15,3 +15,14 @@ export const schemaTypes =
         streamOfConsciousness
     ]
 
+import donatePage from './donatePage'
+
+export const schemaTypes = 
+[
+    boardMember,
+    postType,
+    aboutUs,
+    partnerPast,
+    partnerCurrent,
+    donatePage
+]
