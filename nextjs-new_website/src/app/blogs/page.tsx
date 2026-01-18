@@ -1,27 +1,29 @@
 import Link from "next/link";
 import { client } from "@/sanity/client";
-import { get } from "http";
+
 export interface BlogCard {
   title: string;
   slug: {
     _type: "slug";
     current: string; // This is the string used for the URL
   };
-  author?: {
-    name: string;
-  };
+  author: string;
   publishedAt: string;
   excerpt: string;
 }
 
 async function getBlogCards() {
-  const query = `*[_type == "blogs"]{
-    title,
-    slug,
-    author,
-    publishedAt,
-    excerpt
-  }`;
+  const query = `*[_type == "blogs"] | order(publishedAt desc) {
+  title,
+  slug,
+  author,
+  publishedAt,
+  // Safely fallback to the first paragraph text if excerpt is empty
+  "excerpt": coalesce(
+    excerpt, 
+    "Click to read the full article."
+  )
+}`;
   return client.fetch<BlogCard[]>(query);
 }
 
@@ -33,7 +35,6 @@ export default async function BlogsPage() {
     const month = String(date.getMonth() + 1).padStart(2, "0");
     const day = String(date.getDate()).padStart(2, "0");
 
-    // Use slug.current from your Sanity data
     return `/${month}/${day}/${slug}`;
   };
 
@@ -47,8 +48,7 @@ export default async function BlogsPage() {
               <Link href={getPostUrl(post.publishedAt, post.slug.current)}>
                 <div className="cursor-pointer">
                   <div className="text-[11px] font-bold tracking-[0.2em] text-black mb-5 uppercase">
-                    {post.author?.name} •{" "}
-                    {new Date(post.publishedAt).toISOString()}
+                    {post.author} • {post.publishedAt}
                   </div>
                   <h2 className="text-2xl md:text-3xl font-light leading-snug text-black mb-6 uppercase tracking-wide">
                     {post.title}

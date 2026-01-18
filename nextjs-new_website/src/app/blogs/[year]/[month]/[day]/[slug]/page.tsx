@@ -1,5 +1,8 @@
 import { client } from "@/sanity/client";
 import { PortableText } from "@portabletext/react";
+
+
+
 export default async function BlogPostPage({
   params,
 }: {
@@ -9,9 +12,9 @@ export default async function BlogPostPage({
 
   const query = `*[_type == "blogs" && 
     slug.current == $slug && 
-    string(dateTime(publishedAt).year) == $year &&
-    string(dateTime(publishedAt).month) == $month &&
-    string(dateTime(publishedAt).day) == $day
+    string(date(publishedAt).year) == $year &&
+    string(date(publishedAt).month) == $month &&
+    string(date(publishedAt).day) == $day
   ][0] {
     title,
     publishedAt,
@@ -24,7 +27,7 @@ export default async function BlogPostPage({
 
   const blog = await client.fetch(query, { slug, year, month, day });
 
-  // 3. Simple error handling
+
   if (!blog) {
     return (
       <div className="min-h-screen flex items-center justify-center">

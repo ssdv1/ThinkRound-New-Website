@@ -26,15 +26,14 @@ export default defineType({
     defineField({
       name: 'publishedAt',
       title: 'Published At',
-      type: 'datetime',
+      type: 'date',
     }),
     defineField({
       name: 'excerpt',
       title: 'Excerpt',
       type: 'text',
       rows: 3,
-      description:
-        'A short summary of the post. If left empty, the first sentence of the body will be used.',
+      description: 'A short summary of the post. displayed as a preview in the blog listing.',
     }),
     defineField({
       name: 'body',
