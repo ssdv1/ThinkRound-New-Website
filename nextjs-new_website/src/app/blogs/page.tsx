@@ -1,12 +1,39 @@
 import Link from "next/link";
+import { client } from "@/sanity/client";
+import { get } from "http";
+export interface BlogCard {
+  title: string;
+  slug: {
+    _type: "slug";
+    current: string; // This is the string used for the URL
+  };
+  author?: {
+    name: string;
+  };
+  publishedAt: string;
+  excerpt: string;
+}
 
-export default function BlogsPage() {
-  const posts = [];
+async function getBlogCards() {
+  const query = `*[_type == "blogs"]{
+    title,
+    slug,
+    author,
+    publishedAt,
+    excerpt
+  }`;
+  return client.fetch<BlogCard[]>(query);
+}
 
-  const getPostUrl = (dateStr: string, slug: string) => {
-    const date = new Date(dateStr);
+export default async function BlogsPage() {
+  const posts = await getBlogCards();
+
+  const getPostUrl = (publishedAt: string, slug: string): string => {
+    const date = new Date(publishedAt);
     const month = String(date.getMonth() + 1).padStart(2, "0");
     const day = String(date.getDate()).padStart(2, "0");
+
+    // Use slug.current from your Sanity data
     return `/${month}/${day}/${slug}`;
   };
 
@@ -17,10 +44,11 @@ export default function BlogsPage() {
           {posts.map((post, index) => (
             <div key={index} className="w-full flex flex-col group">
               {/* Clicking this Link triggers a GET request to the formatted URL */}
-              <Link href={getPostUrl(post.date, post.slug)}>
+              <Link href={getPostUrl(post.publishedAt, post.slug.current)}>
                 <div className="cursor-pointer">
                   <div className="text-[11px] font-bold tracking-[0.2em] text-black mb-5 uppercase">
-                    {post.author} • {post.date}
+                    {post.author?.name} •{" "}
+                    {new Date(post.publishedAt).toISOString()}
                   </div>
                   <h2 className="text-2xl md:text-3xl font-light leading-snug text-black mb-6 uppercase tracking-wide">
                     {post.title}
